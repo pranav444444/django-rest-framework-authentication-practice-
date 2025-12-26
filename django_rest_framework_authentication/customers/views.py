@@ -36,11 +36,13 @@ from customers.throttling import JackRateThrottle
 class CustomerCreateView(generics.CreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly] 
-    throttle_classes=[ScopedRateThrottle]
-    throttle_scope='modifystu'
-   
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticatedOrReadOnly] 
+    # throttle_classes=[ScopedRateThrottle]
+    # throttle_scope='modifystu'
+    def perform_create(self, serializer):
+        serializer.save()
+        count_customers_by_city.delay()  # background call
 class CustomerListView(generics.ListAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
